@@ -1,36 +1,60 @@
 from kaggle.api.kaggle_api_extended import KaggleApi
 import json
 import os
+import time
+from datetime import datetime, timedelta
 
-# Create output folder if it doesn't exist
+# Make sure data folder exists
 os.makedirs("data", exist_ok=True)
 
 # Authenticate
 api = KaggleApi()
 api.authenticate()
 
-print("Fetching datasets from Kaggle...")
+print("⏳ Collecting dataset refs...")
+dataset_refs = []
 
-dataset_info = []
+# Step 1: Collect refs from first 30 pages (600 datasets)
+for page in range(1, 31):  # You can increase this up to 50–100 pages later
+    try:
+        datasets = api.dataset_list(sort_by='hottest', page=page)
+        dataset_refs += [d.ref for d in datasets]
+    except Exception as e:
+        print(f"⚠️ Error fetching page {page}: {e}")
+    time.sleep(1)  # Avoid hammering API
 
-# Loop through pages (100 datasets total)
-for page in range(1, 6):  # 5 pages * 20 = 100 datasets
-    datasets = api.dataset_list(sort_by='hottest', page=page)
+print(f"🔍 Total refs collected: {len(dataset_refs)}")
 
-    for d in datasets:
-        dataset_info.append({
-            "ref": d.ref,
-            "title": d.title,
-            "url": f"https://www.kaggle.com/datasets/{d.ref}",
-            "owner": d.owner_name,       # ✅ FIXED here
-            "is_private": d.is_private,  # ✅ snake_case
-            "total_bytes": d.total_bytes
-        })
+# Step 2: Filter by last 5 years
+five_years_ago = datetime.now() - timedelta(days=5*365)
+final_datasets = []
 
-# Write to JSON file
-output_file = "data/datasets.json"
-with open(output_file, "w", encoding="utf-8") as f:
-    json.dump(dataset_info, f, indent=2)
+print("📅 Filtering datasets updated within last 5 years...")
 
-print(f"✅ Saved {len(dataset_info)} datasets to {output_file}")
+for i, ref in enumerate(dataset_refs):
+    try:
+        info = api.dataset_view(ref)
+        updated = datetime.strptime(info.lastUpdated, "%Y-%m-%dT%H:%M:%S.%fZ")
+        if updated >= five_years_ago:
+            final_datasets.append({
+                "ref": info.ref,
+                "title": info.title,
+                "url": f"https://www.kaggle.com/datasets/{info.ref}",
+                "owner": info.ownerName,
+                "is_private": info.isPrivate,
+                "total_bytes": info.totalBytes,
+                "last_updated": info.lastUpdated
+            })
+            print(f"✅ {info.ref} (updated {info.lastUpdated})")
+        else:
+            print(f"⏩ Skipped old: {info.ref}")
+    except Exception as e:
+        print(f"❌ Failed {ref}: {e}")
+    time.sleep(1)  # Slow and safe crawl
 
+# Step 3: Save final JSON
+output_path = "data/datasets.json"
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(final_datasets, f, indent=2)
+
+print(f"✅ Done! Saved {len(final_datasets)} datasets to {output_path}")
