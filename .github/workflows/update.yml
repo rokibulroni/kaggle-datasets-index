@@ -2,8 +2,8 @@ name: Update Kaggle Datasets JSON
 
 on:
   schedule:
-    - cron: "0 0 * * *"         # ✅ Runs daily at 00:00 UTC
-  workflow_dispatch:            # ✅ Manual run from GitHub UI
+    - cron: "0 0 */3 * *"          
+  workflow_dispatch:             
 
 jobs:
   update-datasets:
