@@ -2,8 +2,8 @@ name: Update Kaggle Datasets JSON
 
 on:
   schedule:
-    - cron: "0 */6 * * *"  # Run every 6 hours
-  workflow_dispatch:        # Allow manual trigger from GitHub UI
+    - cron: "0 */6 * * *"  # Every 6 hours
+  workflow_dispatch:
 
 jobs:
   update-datasets:
@@ -19,21 +19,19 @@ jobs:
           python-version: 3.10
 
       - name: Install dependencies
-        run: |
-          pip install kaggle
+        run: pip install kaggle
 
-      - name: Run dataset fetch script
+      - name: Run script
         run: python scripts/update_datasets.py
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
 
-      - name: Commit and push changes
+      - name: Commit changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
           git add data/datasets.json
-          git commit -m "Auto-update Kaggle datasets JSON"
+          git commit -m "Auto-update Kaggle datasets"
           git push
-        continue-on-error: true  # Skip error if nothing changed
-
+        continue-on-error: true
