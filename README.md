@@ -8,9 +8,9 @@ This repository provides a continuously updated list of the **hottest Kaggle dat
 
 You can use this raw JSON in your apps or projects:
 
-```
-https://raw.githubusercontent.com/rokibulroni/kaggle-datasets-index/main/data/datasets.json
-```
+
+ URL:
+[Click Here to See the API](https://cdn.jsdelivr.net/gh/rokibulroni/kaggle-datasets-index@main/data/datasets.json)
 
 ---
 
