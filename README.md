@@ -10,8 +10,8 @@ You can use this raw JSON in your apps or projects:
 
 
  URL:
-[Click Here to See the API](https://cdn.jsdelivr.net/gh/rokibulroni/kaggle-datasets-index@main/data/datasets.json)
-
+[Click Here to See the API](https://rokibulroni.github.io/kaggle-datasets-index/data/datasets.json)
+ 
 ---
 
 ## 📁 Dataset Format
