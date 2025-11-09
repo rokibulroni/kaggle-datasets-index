@@ -2,7 +2,7 @@ name: Update Kaggle Datasets JSON
 
 on:
   schedule:
-    - cron: "0 0 */3 * *"          
+    - cron: "0 0 1,16 * *"   # ~Every 15 days (1st and 16th, UTC)     
   workflow_dispatch:             
 
 jobs:
